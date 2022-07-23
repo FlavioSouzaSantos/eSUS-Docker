@@ -1,5 +1,5 @@
 FROM centos/systemd
-MAINTAINER "Flávio de Souza Santos" <desouza.flavio@gmail.com>
+MAINTAINER "Seu nome" <seuemail@gmail.com>
 RUN yum -y install file \
 	&& yum -y install wget \
 	&& yum clean all \
