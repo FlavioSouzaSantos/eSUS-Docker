@@ -1,0 +1,41 @@
+services:
+  database:
+    container_name: esus_database
+    image: esus_database:1.0.0
+    build: database
+    ports:
+      - '5432:5432'
+    networks:
+      - esus_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+  webserver:
+    container_name: esus_webserver
+    image: esus_webserver:5.2.31
+    build:
+      context: webserver
+      args:
+        - URL_DOWNLOAD_ESUS=https://arquivos.esusab.ufsc.br/PEC/1af9b7ee9c3886bd/5.3.21/eSUS-AB-PEC-5.3.21-Linux64.jar
+        - APP_DB_URL
+        - APP_DB_USER=postgres
+        - APP_DB_PASSWORD=esus
+    ports:
+      - '8080:8080'
+    networks:
+      - esus_network
+    depends_on:
+      database:
+        condition: service_healthy
+    healthcheck:
+      test: "curl -f http://localhost:8080"
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+networks:
+  esus_network:
+    driver: bridge
